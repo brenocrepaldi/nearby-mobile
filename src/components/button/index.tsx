@@ -13,7 +13,7 @@ type ButtonProps = TouchableOpacityProps & {
 	isLoading?: boolean;
 };
 
-function Button({ children, style, isLoading, ...rest }: ButtonProps) {
+function Button({ children, style, isLoading = false, ...rest }: ButtonProps) {
 	return (
 		<TouchableOpacity
 			activeOpacity={0.8}

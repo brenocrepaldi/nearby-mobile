@@ -17,7 +17,6 @@ export default function Layout() {
 		Rubik_600SemiBold,
 	});
 
-	console.log(fontsLoaded);
 	if (!fontsLoaded) return <Loading />;
 
 	return (

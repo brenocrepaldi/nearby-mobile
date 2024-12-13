@@ -1,14 +1,30 @@
-import { View, Text, Alert } from 'react-native';
+import { View, Alert, Text } from 'react-native';
 import { useEffect, useState } from 'react';
 import { api } from '@/services/api';
 import { CategoriesList, CategoryProps } from '@/components/categories';
 import { PlaceProps } from '@/components/place-list/place-item';
 import { PlaceList } from '@/components/place-list';
 
-type PlacesProps = PlaceProps;
+import MapView, { Callout, Marker } from 'react-native-maps';
+import * as Location from 'expo-location';
+import { colors } from '@/styles/colors';
+import { fontFamily } from '@/styles/font-family';
+
+type PlacesProps = PlaceProps & {
+	latitude: number;
+	longitude: number;
+};
+
+const currentLocation = {
+	latitude: -23.561187293883442,
+	longitude: -46.656451388116494,
+};
 
 export default function Home() {
-	const [places, setPlaces] = useState<PlaceProps[]>([]);
+	const [location, setLocation] = useState<Location.LocationObject | null>(
+		null
+	);
+	const [places, setPlaces] = useState<PlacesProps[]>([]);
 	const [categories, setCategories] = useState<CategoryProps[]>([]);
 	const [selectedCategory, setSelectedCategory] = useState<string>('');
 
@@ -35,9 +51,25 @@ export default function Home() {
 		}
 	}
 
+	async function getCurrentLocation() {
+		try {
+			const { granted } = await Location.requestForegroundPermissionsAsync();
+
+			if (granted) {
+				let location = await Location.getCurrentPositionAsync({});
+				setLocation(location);
+			} else {
+				let location = await Location.getCurrentPositionAsync({});
+				setLocation(location);
+			}
+		} catch (error) {
+			console.log('Error getting current location:', error);
+		}
+	}
+
 	useEffect(() => {
+		// getCurrentLocation();
 		fetchCategories();
-		fetchPlaces();
 	}, []);
 
 	useEffect(() => {
@@ -45,12 +77,63 @@ export default function Home() {
 	}, [selectedCategory]);
 
 	return (
-		<View style={{ flex: 1, backgroundColor: '#CECECE' }}>
+		<View style={{ flex: 1 }}>
 			<CategoriesList
 				data={categories}
 				selected={selectedCategory}
 				onSelected={setSelectedCategory}
 			/>
+
+			<MapView
+				style={{ flex: 1 }}
+				initialRegion={{
+					latitude: currentLocation.latitude,
+					longitude: currentLocation.longitude,
+					latitudeDelta: 0.01,
+					longitudeDelta: 0.01,
+				}}
+			>
+				<Marker
+					identifier="current"
+					coordinate={{
+						latitude: currentLocation.latitude,
+						longitude: currentLocation.longitude,
+					}}
+					image={require('@/assets/location.png')}
+				/>
+
+				{places.map((item) => (
+					<Marker
+						key={item.id}
+						identifier={item.id}
+						coordinate={{ latitude: item.latitude, longitude: item.longitude }}
+						image={require('@/assets/pin.png')}
+					>
+						<Callout>
+							<View>
+								<Text
+									style={{
+										fontSize: 14,
+										color: colors.gray[600],
+										fontFamily: fontFamily.medium,
+									}}
+								>
+									{item.name}
+								</Text>
+								<Text
+									style={{
+										fontSize: 12,
+										color: colors.gray[600],
+										fontFamily: fontFamily.regular,
+									}}
+								>
+									{item.address}
+								</Text>
+							</View>
+						</Callout>
+					</Marker>
+				))}
+			</MapView>
 
 			<PlaceList data={places} />
 		</View>

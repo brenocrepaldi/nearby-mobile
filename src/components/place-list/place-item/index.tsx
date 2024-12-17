@@ -1,4 +1,4 @@
-import { TouchableOpacity, View, Text, Image } from 'react-native';
+import { TouchableOpacity, TouchableOpacityProps, View, Text, Image } from 'react-native';
 import { colors } from '@/styles/theme';
 import { s } from './styles';
 import { IconTicket } from '@tabler/icons-react-native';
@@ -12,7 +12,7 @@ export type PlaceProps = {
 	address: string;
 };
 
-type PlaceItemProps = {
+type PlaceItemProps = TouchableOpacityProps &  {
 	data: PlaceProps;
 };
 

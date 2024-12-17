@@ -1,4 +1,4 @@
-import { View, Alert, Text } from 'react-native';
+import { View, Alert, Text, TouchableOpacity } from 'react-native';
 import { useEffect, useState } from 'react';
 import { api } from '@/services/api';
 import { CategoriesList, CategoryProps } from '@/components/categories';
@@ -9,6 +9,7 @@ import MapView, { Callout, Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { colors } from '@/styles/colors';
 import { fontFamily } from '@/styles/font-family';
+import { router } from 'expo-router';
 
 type PlacesProps = PlaceProps & {
 	latitude: number;
@@ -109,7 +110,14 @@ export default function Home() {
 						coordinate={{ latitude: item.latitude, longitude: item.longitude }}
 						image={require('@/assets/pin.png')}
 					>
-						<Callout>
+						<Callout
+							onPress={() =>
+								router.push({
+									pathname: '/place/[id]',
+									params: { id: item.id },
+								})
+							}
+						>
 							<View>
 								<Text
 									style={{
